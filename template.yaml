@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Parameters:
+  FunctionName:
+    Type: String
+    Default: LambdaVersionFinder
+    Description: The name of the Lambda function
+
+Resources:
+  LambdaVersionFinderFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: !Ref LambdaVersionFinder
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      CodeUri: src
+      Description: 'Handles incoming data submissions from CognitoForms'
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - PermissionsForLambdaVersionFinder
+      Tracing: Active  # Enable AWS X-Ray tracing if needed
