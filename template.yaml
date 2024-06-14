@@ -10,14 +10,17 @@ Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
     Default: vpc-0b3fedbd3cb005585
-    Description: The VPC to deploy the Lambda function into
+    Description: The ID of the VPC
 
-  SubnetIds:
-    Type: List<AWS::EC2::Subnet::Id>
-    Default: 
-      - subnet-0dd5ee5ee4ad36255
-      - subnet-0c363b383db077bf9
-    Description: List of Subnet IDs within the VPC
+  SubnetId1:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0dd5ee5ee4ad36255
+    Description: The ID of the first subnet
+
+  SubnetId2:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0c363b383db077bf9
+    Description: The ID of the second subnet
 
 Resources:
   LambdaVersionFinderFunction:
@@ -33,28 +36,33 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - arn:aws:iam::905418480469:policy/PermissionsForLambdaVersionFinder
-      Tracing: Active
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaVersionFinderSecurityGroup
+        SubnetIds: 
+          - !Ref SubnetId1
+          - !Ref SubnetId2
 
   LambdaVersionFinderSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupName: !Sub ${FunctionName}-sg
+      GroupName: !Sub ${FunctionName}SG
       GroupDescription: 'Security group for LambdaVersionFinder'
       VpcId: !Ref VpcId
-      SecurityGroupIngress:  # Allow all inbound traffic within VPC
+      SecurityGroupIngress:
         - IpProtocol: -1
           FromPort: 0
           ToPort: 65535
-          CidrIp: !GetAtt Vpc.CidrBlock  # Allow all IPs within the VPC
-      SecurityGroupEgress:   # Allow all outbound traffic within VPC
+          CidrIp: 10.2.0.0/16
+      SecurityGroupEgress:
         - IpProtocol: -1
           FromPort: 0
           ToPort: 65535
-          CidrIp: !GetAtt Vpc.CidrBlock 
-          
-  LiveAlias:  # Create the alias
+          CidrIp: 0.0.0.0/0
+
+  LiveAlias: 
     Type: 'AWS::Lambda::Alias'
     Properties:
       FunctionName: !Ref LambdaVersionFinderFunction
-      FunctionVersion: '$LATEST'  # Always point to the latest version
+      FunctionVersion: '$LATEST'
       Name: live
