@@ -11,7 +11,7 @@ Resources:
   LambdaVersionFinderFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      FunctionName: !Ref LambdaVersionFinder
+      FunctionName: !Ref FunctionName
       Handler: lambda_function.lambda_handler
       Runtime: python3.12
       CodeUri: src
