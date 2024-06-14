@@ -9,27 +9,23 @@ def get_highest_version(event, context):
     try:
         response = lambda_client.list_versions_by_function(
             FunctionName=function_name,
-            MaxItems=100  # Adjust if you have many versions
+            MaxItems=100 
         )
 
         versions = response['Versions']
 
-        # Filter out $LATEST and find the max numeric version
-        highest_version = max(
-            (int(v['Version']) for v in versions if v['Version'] != '$LATEST'),
-            default=None
-        )
+        # Filter and find max numeric version (changed to list comprehension)
+        numbered_versions = [int(v['Version']) for v in versions if v['Version'] != '$LATEST']
 
-        if highest_version:
-            return {
-                'statusCode': 200,
-                'body': json.dumps({'highest_version': highest_version})
-            }
+        if numbered_versions:
+            highest_version = max(numbered_versions)
         else:
-            return {
-                'statusCode': 404,
-                'body': json.dumps({'error': 'No published versions found'})
-            }
+            highest_version = 0  # Return 0 if no numbered versions found
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'highest_version': highest_version})
+        }
 
     except lambda_client.exceptions.ResourceNotFoundException:
         return {

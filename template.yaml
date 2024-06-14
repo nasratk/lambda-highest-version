@@ -7,6 +7,18 @@ Parameters:
     Default: LambdaVersionFinder
     Description: The name of the Lambda function
 
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-0b3fedbd3cb005585
+    Description: The VPC to deploy the Lambda function into
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Default: 
+      - subnet-0dd5ee5ee4ad36255
+      - subnet-0c363b383db077bf9
+    Description: List of Subnet IDs within the VPC
+
 Resources:
   LambdaVersionFinderFunction:
     Type: 'AWS::Serverless::Function'
@@ -21,8 +33,25 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
         - arn:aws:iam::905418480469:policy/PermissionsForLambdaVersionFinder
-      Tracing: Active  # Enable AWS X-Ray tracing if needed
+      Tracing: Active
 
+  LambdaVersionFinderSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: !Sub ${FunctionName}-sg
+      GroupDescription: 'Security group for LambdaVersionFinder'
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:  # Allow all inbound traffic within VPC
+        - IpProtocol: -1
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: !GetAtt Vpc.CidrBlock  # Allow all IPs within the VPC
+      SecurityGroupEgress:   # Allow all outbound traffic within VPC
+        - IpProtocol: -1
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: !GetAtt Vpc.CidrBlock 
+          
   LiveAlias:  # Create the alias
     Type: 'AWS::Lambda::Alias'
     Properties:
