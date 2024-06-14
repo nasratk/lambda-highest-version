@@ -20,5 +20,5 @@ Resources:
       Timeout: 10
       Policies:
         - AWSLambdaBasicExecutionRole
-        - PermissionsForLambdaVersionFinder
+        - CodeBuildPermissionsForLambdaVersionFinder
       Tracing: Active  # Enable AWS X-Ray tracing if needed
