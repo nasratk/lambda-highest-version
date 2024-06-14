@@ -20,5 +20,12 @@ Resources:
       Timeout: 10
       Policies:
         - AWSLambdaBasicExecutionRole
-        - PermissionsForLambdaVersionFinder
+        - arn:aws:iam::905418480469:policy/PermissionsForLambdaVersionFinder
       Tracing: Active  # Enable AWS X-Ray tracing if needed
+
+  LiveAlias:  # Create the alias
+    Type: 'AWS::Lambda::Alias'
+    Properties:
+      FunctionName: !Ref LambdaVersionFinderFunction
+      FunctionVersion: '$LATEST'  # Always point to the latest version
+      Name: live
