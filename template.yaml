@@ -30,7 +30,7 @@ Resources:
       Handler: lambda_function.get_highest_version
       Runtime: python3.12
       CodeUri: src
-      Description: 'Handles incoming data submissions from CognitoForms'
+      Description: 'Queries lambda functions and returns the highest published version'
       MemorySize: 128
       Timeout: 10
       Policies:
