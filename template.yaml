@@ -72,7 +72,8 @@ Resources:
                   - ec2:AssignPrivateIpAddresses
                   - ec2:UnassignPrivateIpAddresses
                 Resource: "*"
-        - AWSLambdaBasicExecutionRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   LambdaVersionFinderSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
