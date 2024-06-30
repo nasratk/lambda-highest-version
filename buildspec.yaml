@@ -15,15 +15,11 @@ phases:
         with open("src/requirements.txt", "rb") as f:
           detected = chardet.detect(f.read())
           encoding = detected["encoding"]
-          print(encoding)
         ')
         echo "Detected encoding: $encoding"
         if [ "$encoding" != "utf-8" ] && [ -n "$encoding" ]; then
-          echo "Converting requirements.txt from $encoding to utf-8"
           iconv -f "$encoding" -t UTF-8 src/requirements.txt -o src/requirements.txt.utf8
           mv src/requirements.txt.utf8 src/requirements.txt
-        else
-          echo "No conversion necessary. The encoding is already UTF-8."
         fi
 
   pre_build:
@@ -35,7 +31,7 @@ phases:
   build:
     commands:
       - echo "Packaging application..."
-      - aws cloudformation package --template-file template.yaml --s3-bucket codepipeline-eu-west-2-873527706083 --s3-prefix LambdaVersionFinderCP --output-template-file packaged.yaml
+      - aws cloudformation package --template-file template.yaml --s3-bucket $CODEPIPELINE_BUCKET --s3-prefix $S3_PREFIX --output-template-file packaged.yaml
       - sam build --template packaged.yaml --use-container
 
 artifacts:
