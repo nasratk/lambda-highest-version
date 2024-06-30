@@ -42,9 +42,9 @@ Resources:
       Role: !GetAtt LambdaExecutionRole.Arn
 
   LambdaExecutionRole:
-    FunctionName: !Sub ExecutionRoleFor${FunctionName}
     Type: 'AWS::IAM::Role'
     Properties: 
+      RoleName: !Sub ExecutionRoleFor${FunctionName}
       AssumeRolePolicyDocument: 
         Version: '2012-10-17'
         Statement: 
