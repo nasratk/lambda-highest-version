@@ -33,15 +33,46 @@ Resources:
       Description: 'Queries lambda functions and returns the highest published version'
       MemorySize: 128
       Timeout: 10
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - arn:aws:iam::905418480469:policy/PermissionsForLambdaVersionFinder
       VpcConfig:
         SecurityGroupIds:
           - !Ref LambdaVersionFinderSecurityGroup
         SubnetIds: 
           - !Ref SubnetId1
           - !Ref SubnetId2
+      Role: !GetAtt LambdaExecutionRole.Arn
+
+  LambdaExecutionRole:
+    FunctionName: !Sub ExecutionRoleFor${FunctionName}
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+          - Effect: Allow
+            Principal: 
+              Service: 
+                - lambda.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      Policies: 
+        - PolicyName: LambdaVersionFinderPolicy
+          PolicyDocument: 
+            Version: '2012-10-17'
+            Statement: 
+              - Effect: Allow
+                Action: 
+                  - lambda:ListVersionsByFunction
+                  - lambda:GetFunction
+                Resource: "*"
+              - Effect: Allow
+                Action: 
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                  - ec2:AssignPrivateIpAddresses
+                  - ec2:UnassignPrivateIpAddresses
+                Resource: "*"
+        - AWSLambdaBasicExecutionRole
 
   LambdaVersionFinderSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
